@@ -1,0 +1,28 @@
+{
+  "menus": [
+    {
+      "id": 1,
+      "name": "Main Course 1",
+      "quantity": 12
+    },
+    {
+      "id": 2,
+      "name": "Dessert 2",
+      "quantity": 1
+    },
+    {
+      "id": 3,
+      "name": "Main Course 1",
+      "quantity": 2
+    }
+  ],
+  "bookings": [
+    {
+      "id": "23ac",
+      "name": "Tofa",
+      "email": "nugrahatofa@gmail.com",
+      "date": "Sat, Dec 11 1999",
+      "npeople": 11
+    }
+  ]
+}
