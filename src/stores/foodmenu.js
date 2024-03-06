@@ -9,7 +9,7 @@ export const useFoodmenuStore = defineStore('menu', () => {
   async function fetchItems() {
     try {
       // Replace with your actual API endpoint
-      const response = await fetch('http://localhost:5173/menus');
+      const response = await fetch('http://localhost:5174/menus');
       const data = await response.json();
       items.value = data;
     } catch (error) {
@@ -19,13 +19,10 @@ export const useFoodmenuStore = defineStore('menu', () => {
 
   // Add a new item
   async function addItem(newItem) {
-    // const rndInt = Math.floor(Math.random() * 1000) + 1
-    // newItem['photolink'] = `https://picsum.photos/id/${rndInt}/200`
-    // console.log(newItem)
     
     try {
       // Replace with your actual API endpoint
-      const response = await fetch('http://localhost/5173/menus', {
+      const response = await fetch('http://localhost:5174/menus', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +42,7 @@ export const useFoodmenuStore = defineStore('menu', () => {
 
     try {
       // Replace with your actual API endpoint
-      const response = await fetch(`http://localhost:5173/menus/${updatedItem.id}`, {
+      const response = await fetch(`http://localhost:5174/menus/${updatedItem.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -64,10 +61,10 @@ export const useFoodmenuStore = defineStore('menu', () => {
   async function deleteItem(itemId) {
     try {
       // Replace with your actual API endpoint
-      await fetch(`http://localhost:5173/menus/${itemId}`, {
+      await fetch(`http://localhost:5174/menus/${itemId}`, {
         method: 'DELETE',
       });
-
+      console.log(itemId)
       items.value = items.value.filter((item) => item.id !== itemId);
     } catch (error) {
       console.error('Error deleting item:', error);

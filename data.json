@@ -1,28 +1,48 @@
 {
   "menus": [
     {
-      "id": 1,
-      "name": "Main Course 1",
-      "quantity": 12
+      "id": "1",
+      "name": "asdasdasd",
+      "price": 1334,
+      "description": "sfadsfsd",
+      "photolink": "https://picsum.photos/id/1/200"
     },
     {
-      "id": 2,
-      "name": "Dessert 2",
-      "quantity": 1
+      "id": "3",
+      "name": "asdasdasd",
+      "price": 1313,
+      "description": "efadfa",
+      "photolink": "https://picsum.photos/id/3/200"
     },
     {
-      "id": 3,
-      "name": "Main Course 1",
-      "quantity": 2
+      "id": "4",
+      "name": "aasdsadad",
+      "price": 123,
+      "description": "fsdfds",
+      "photolink": "https://picsum.photos/id/4/200"
+    },
+    {
+      "id": "5",
+      "name": "sdasdasd",
+      "price": 13,
+      "description": "dsadasd",
+      "photolink": "https://picsum.photos/id/5/200"
     }
   ],
   "bookings": [
     {
-      "id": "23ac",
-      "name": "Tofa",
-      "email": "nugrahatofa@gmail.com",
-      "date": "Sat, Dec 11 1999",
-      "npeople": 11
+      "id": "1",
+      "name": "dadasdaada",
+      "email": "adwawdad",
+      "date": "Tue, Dec 12 1234",
+      "npeople": 12
+    },
+    {
+      "id": "2",
+      "name": "asdasdas",
+      "email": "awdadad",
+      "date": "Thu, Mar 13 3321",
+      "npeople": 121
     }
   ]
 }

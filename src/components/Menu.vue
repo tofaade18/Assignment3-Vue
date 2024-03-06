@@ -1,517 +1,326 @@
-<!-- views/Menu.vue -->
-<!-- <template>
-  <div class="menu">
-    <h1>Menu</h1>
+<script setup>
+import { ref, reactive } from 'vue';
+import { useFoodmenuStore } from '@/stores/foodmenu'
 
-    <div v-for="(section, index) in menuSections" :key="index" class="menu-section">
-      <h2>{{ section.title }}</h2>
+const foodmenustore = useFoodmenuStore()
+foodmenustore.fetchItems();
+// const ids = localStorage.getItem('lastUsedId') || 0;
+const editobj = reactive({
+    id: '',
+    name: '',
+    price: '',
+    description: '',
+    photolink: ''
+})
 
-      <div v-for="(item, i) in section.items" :key="i" class="menu-item">
-        <div class="item-info">
-          <h3>{{ item.name }}</h3>
-          <p>{{ item.description }}</p>
-          <p>Price: ${{ item.price.toFixed(2) }}</p>
-        </div>
-
-        <div class="item-controls">
-          <button @click="addToOrder(section.title, item)">+</button>
-          <span>{{ getOrderQuantity(section.title, item) }}</span>
-          <button @click="subtractFromOrder(section.title, item)">-</button>
-        </div>
-      </div>
-    </div>
-
-    <h2>Your Order</h2>
-    <ul>
-      <li v-for="(quantity, itemName) in order" :key="itemName">
-        {{ itemName }}: {{ quantity }}
-      </li>
-    </ul>
-  </div>
-</template>
-
-<script>
-import { ref } from 'vue';
-
-export default {
-  name: 'Menu',
-  data() {
-    return {
-      menuSections: [
-        {
-          title: 'Appetizers',
-          items: [
-            { name: 'Appetizer 1', description: 'Description 1', price: Math.random() * 10 },
-            { name: 'Appetizer 2', description: 'Description 2', price: Math.random() * 10 },
-            // Add more appetizers as needed
-          ],
-        },
-        {
-          title: 'Main Courses',
-          items: [
-            { name: 'Main Course 1', description: 'Description 1', price: Math.random() * 20 },
-            { name: 'Main Course 2', description: 'Description 2', price: Math.random() * 20 },
-            // Add more main courses as needed
-          ],
-        },
-        {
-          title: 'Desserts',
-          items: [
-            { name: 'Dessert 1', description: 'Description 1', price: Math.random() * 8 },
-            { name: 'Dessert 2', description: 'Description 2', price: Math.random() * 8 },
-            // Add more desserts as needed
-          ],
-        },
-      ],
-      order: {},
-    };
-  },
-  methods: {
-    addToOrder(sectionTitle, item) {
-      const key = `${sectionTitle}-${item.name}`;
-      this.order[key] = (this.order[key] || 0) + 1;
-    },
-    subtractFromOrder(sectionTitle, item) {
-      const key = `${sectionTitle}-${item.name}`;
-      if (this.order[key] > 0) {
-        this.order[key]--;
-        if (this.order[key] === 0) {
-          delete this.order[key];
-        }
-      }
-    },
-    getOrderQuantity(sectionTitle, item) {
-      const key = `${sectionTitle}-${item.name}`;
-      return this.order[key] || 0;
-    },
-  },
+const createobj = reactive({
+  name: '',
+  price: '',
+  description:''
+})
+const onClickEdit= (id, name, price, description, photolink) => {
+  editobj.id = id;
+  editobj.name = name;
+  editobj.price = price,
+  editobj.description = description
+  editobj.photolink = photolink
 };
+
+const onClickDelete= (id) => {
+
+    foodmenustore.deleteItem(id);
+
+};
+
+const onHandleCreate = async () => {
+  if (!createobj.name.trim() || !createobj.price || !createobj.description.trim()) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+  try {
+        // Fetch all items to get the latest ID
+        await foodmenustore.fetchItems();
+        
+        // Find the maximum ID among the existing items
+        const maxId = foodmenustore.items.reduce((max, item) => Math.max(max, item.id), 0);
+
+        // Generate the new ID
+        const newId = maxId + 1;
+
+        // Create the new item
+        const data = {
+            id: `${newId}`,
+            name: createobj.name.trim(),
+            price: createobj.price,
+            description: createobj.description.trim(),
+            photolink: `https://picsum.photos/id/${newId}/200`
+        };
+
+        // Add the new item to the store
+        await foodmenustore.addItem(data);
+
+        // Reset the form fields
+        createobj.name = '';
+        createobj.price = '';
+        createobj.description = '';
+    } catch (error) {
+        console.error('Error creating item:', error);
+    }
+};
+
+
+const onHandleEdit= () => {
+  if (!editobj.name.trim() || !editobj.price || !editobj.description.trim()) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+  const data = {
+    id: editobj.id,
+    name: editobj.name,
+    price: editobj.price,
+    description: editobj.description,
+    photolink: editobj.photolink
+    }
+    
+    foodmenustore.updateItem(data);
+
+};
+
+
 </script>
-
-<style scoped>
-/* Add your custom styles for the Menu component here */
-.menu {
-  max-width: 800px;
-  margin: auto;
-}
-
-.menu-section {
-  margin-bottom: 20px;
-}
-
-.menu-item {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #ccc;
-  padding: 10px 0;
-}
-
-.item-controls {
-  display: flex;
-  align-items: center;
-}
-
-button {
-  background-color: #007bff;
-  color: #fff;
-  padding: 5px 10px;
-  margin-left: 5px;
-  border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-</style> -->
-
-<!-- <template>
-  <div>
-    <h1>Food Menu</h1>
-    <button @click="showAddModal">Add Menu Item</button>
-    <button @click="showEditModal">Edit Menu Item</button>
-
-    <div v-if="showAddModalFlag" class="modal">
-      <div class="modal-content">
-        <span @click="closeAddModal" class="close">&times;</span>
-        <h2>Add Menu Item</h2>
-        <form @submit.prevent="addMenuItem">
-          <label for="name">Name:</label>
-          <input type="text" v-model="newMenuItem.items.name" required><br>
-
-          <label for="price">Price:</label>
-          <input type="number" v-model="newMenuItem.items.price" required><br>
-
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </div>
-
-    <div v-if="showEditModalFlag" class="modal">
-      <div class="modal-content">
-        <span @click="closeEditModal" class="close">&times;</span>
-        <h2>Edit Menu Item</h2>
-        <form @submit.prevent="editMenuItem">
-          <label for="name">Name:</label>
-          <input type="text" v-model="selectedMenuItem.name" required><br>
-
-          <label for="price">Price:</label>
-          <input type="number" v-model="selectedMenuItem.price" required><br>
-
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script>
-import { ref } from 'vue';
-
-export default {
-  name: 'FoodMenu',
-  data() {
-    return {
-      showAddModalFlag: false,
-      showEditModalFlag: false,
-      newMenuItem: [
-        {
-          title: 'Appetizers',
-          items: [
-            { name: 'Appetizer 1', description: 'Description 1', price: Math.random() * 10 },
-            { name: 'Appetizer 2', description: 'Description 2', price: Math.random() * 10 },
-          ],
-        },
-        {
-          title: 'Main Courses',
-          items: [
-            { name: 'Main Course 1', description: 'Description 1', price: Math.random() * 20 },
-            { name: 'Main Course 2', description: 'Description 2', price: Math.random() * 20 },
-            // Add more main courses as needed
-          ],
-        },
-        {
-          title: 'Desserts',
-          items: [
-            { name: 'Dessert 1', description: 'Description 1', price: Math.random() * 8 },
-            { name: 'Dessert 2', description: 'Description 2', price: Math.random() * 8 },
-            // Add more desserts as needed
-          ],
-        },
-      ],
-      selectedMenuItem: null,
-    };
-  },
-  methods: {
-    showAddModal() {
-      this.showAddModalFlag = true;
-    },
-    closeAddModal() {
-      this.showAddModalFlag = false;
-    },
-    addMenuItem() {
-      const apiUrl = 'http://localhost:5174/menus';
-      const requestBody = {
-        name: this.newMenuItem.items.name,
-        desc: this.newMenuItem.items.description,
-        price: this.newMenuItem.items.price
-      };
-
-      // Fetch options
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      };
-
-      // Make API call
-      fetch(apiUrl, options)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to add menu item');
-          }
-          // Close the modal upon successful submission
-          this.closeAddModal();
-        })
-        .catch(error => {
-          console.error('Error adding menu item:', error);
-          // Handle error
-        });
-    },
-    showEditModal() {
-      this.showEditModalFlag = true;
-      // Fetch menu item details from API based on selected item
-      // Assign fetched data to this.selectedMenuItem
-    },
-    closeEditModal() {
-      this.showEditModalFlag = false;
-    },
-    editMenuItem() {
-      // Submit edited menu item to API
-      // Use fetch or Axios to make the API call
-      // After successful submission, close the modal
-      this.closeEditModal();
-    },
-  },
-};
-</script> -->
-
-<!-- <style>
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-.close {
-  color: #aaaaaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-</style> -->
-
-
-<!-- <template>
-  <div class="container p-5">
-    <button @click="showAddModal = true">Add Menu Item</button>
-    <button @click="showEditModal = true">Edit Menu Item</button>
-    <div v-if="showAddModal" class="modal">
-      <div class="modal-content">
-        <h2>Add Menu</h2>
-        <form @submit.prevent ="addMenuItem">
-          <label for="name">Name</label>
-          <input type="text" required> <br>
-          
-          <label for="price">Price</label>
-          <input type="number" required> <br>
-          <button type="submit">Submit</button>
-        </form>
-        <button @click="showAddModal = false">Close</button>
-      </div>
-    </div>
-
-    <div v-if="showEditModal" class="modal">
-      <div class="modal-content">
-        <h2>Edit Menu</h2>
-        <h6>KOK GABISA SIH COKKKK</h6>
-        <button @click="showEditModal = false">Close</button>
-      </div>
-    </div>
-  </div>
-</template> -->
-
-<!-- <script>
-export default {
-  data() {
-    return {
-      showAddModal: false,
-      showEditModal: false,
-    };
-  },
-};
-</script> -->
 
 <template>
-  <div class="container p-5">
-    <button @click="showAddModal = true">Add your order</button>
-    <button @click="showEditModal = true">Edit Menu Item</button>
-
-    <div v-if="showAddModal" class="modal">
-      <div class="modal-content">
-        <h2>Add Menu</h2>
-        <form @submit.prevent="addMenuItem">
-          <label for="name">Name</label>
-          <select v-model="newMenuItem.name" required>
-          <option disabled value="">Select one</option><option>PotatoWedges</option><option>Spring Mix Salad</option><option>Hotplate Steak</option><option>Spaghetti Carbonara</option><option>Panacotta</option><option>Ice Cream Cake</option></select>
-          <label for="Quantity">Quantity</label>
-          <input type="number" v-model="newMenuItem.quantity" required><br>
-          <button type="submit">Submit</button>
-        </form>
-        <button @click="closeAddModal">Close</button>
-      </div>
+    <!-- Add Menu Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Add Menu</h1>
+            <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        </div>
+        <div class="modal-body" style="display: inline-flex;">
+            <form class="row g-3">
+                <div class="form-floating col-md-6">
+                  <label for="floatingName" style="display: flex; color: darkblue;">Menu Name</label>
+                  <input type="text" class="form-control" id="floatingName" placeholder="Duck Breast" v-model="createobj.name" required>
+                </div>
+                <div class="form-floating col-md-6">
+                  <label for="floatingPrice" style="display: flex; color: darkblue;">Menu Price</label>
+                  <input type="number" class="form-control" id="floatingPrice" placeholder="10" v-model="createobj.price" required>                </div>
+                <div class="form-floating col-12" id="textareaform">
+                  <label for="floatingTextarea2" style="display: flex; color: darkblue;">Description</label>
+                  <textarea class="form-control" placeholder="Leave a description here" id="floatingTextarea2" v-model="createobj.description" style="height: 120px" required></textarea>                </div>
+            </form>
+              <div class="col-md-6">
+                <img src="@/assets/img4.jpg" alt="Image" class="img-fluid" style="width: 420px; margin-left: 40px;">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" @click="onHandleCreate()" data-bs-dismiss="modal">Add Menu</button>
+          <button type="button" class="btn btn-secondary" style="background-color: gray;" data-bs-dismiss="modal">Close</button>        </div>
+        </div>
+    </div>
+    </div>
+    <!-- Edit Menu Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5" id="editModalLabel">Edit Menu</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="display: inline-flex;">
+            <form class="row g-3">
+                <div class="form-floating col-md-6">
+                  <label for="floatingName" style="display: flex; color: darkgoldenrod;">Menu Name</label>
+                  <input type="text" class="form-control" id="floatingName" placeholder="Chicken Burger" v-model="editobj.name">                </div>
+                <div class="form-floating col-md-6">
+                  <label for="floatingPrice" style="display: flex; color: darkgoldenrod;">Menu Price</label>
+                  <input type="number" class="form-control" id="floatingPrice" placeholder="100" v-model="editobj.price">                </div>
+                <div class="form-floating col-12" id="textareaform">
+                  <label for="floatingTextarea2" style="display: flex; color: darkgoldenrod;">Link</label>
+                  <textarea class="form-control" placeholder="Leave a description here" id="floatingTextarea2" v-model="editobj.photolink" style="height: 125px" ></textarea>
+                </div>
+            </form>
+            <div class="col-md-6">
+              <img src="@/assets/img4.jpg" alt="Image" class="img-fluid" style="width: 420px; margin-left: 40px;">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" @click="onHandleEdit()" data-bs-dismiss="modal">Save changes</button>
+          <button type="button" class="btn btn-secondary" style="background-color: gray;" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
     </div>
 
-    <div v-if="showEditModal" class="modal">
-      <div class="modal-content">
-        <h2>Edit Menu</h2>
-        <form @submit.prevent="editMenuItem">
-          <label for="name">Name:</label>
-          <input type="text" v-model="selectedMenuItem.name" required><br>
+    <!-- Menu Start -->
+    <div class="container-xxl py-5">
+        <div class="container" style="margin-top: 70px; margin-left: 30px;">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h2 class="section-title ff-secondary text-center text-primary fw-bolder">Food Menu</h2>
+                <button type="button" class="addmenubutton" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Menu</button>
+            </div>
+            <hr>
+            <div class="tab-class text-center wow fadeInUp mt-5" data-wow-delay="0.1s">
+                <div class="row g-4">
+                    <div 
+                        class="col-lg-6"
+                        v-for="item in foodmenustore.items"
+                        :key="item.id"
+                    >
+                        <div class="d-flex align-items-center" style="margin-top: 10px;">
+                            <img class="flex-shrink-0 img-fluid rounded" :src="item.photolink" alt="" style="width: 200px;">
+                            <div class="w-100 d-flex flex-column text-start ps-4">
+                                <h4 class="d-flex justify-content-between border-bottom pb-2">
+                                    <h2 style="color: blueviolet; font-weight: bolder;">{{ item.name }}</h2>
+                                    <small class="fst-italic" style="color: black;">{{ item.description }}</small>
+                                    <h4 class="text-primary fw-bold" style="font-family: 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS', 'sans-serif';">Price: {{ `$${item.price}` }}</h4>
+                                </h4>
+                                <div class="mt-3" >
+                                <button type="button" class="btn me-3" @click="onClickEdit(item.id, item.name, item.price, item.description, item.photolink)" data-bs-toggle="modal" data-bs-target="#editModal" style="width: 48%; margin-right: 10px; background-color: greenyellow;">Edit Menu</button>
+                                <button type="button" class="btn btn-outline-primary" @click="onClickDelete(item.id)" style="width: 48%; background-color: maroon; color: white;">Delete</button>
 
-          <label for="price">Price:</label>
-          <input type="number" v-model="selectedMenuItem.price" required><br>
-
-          <button type="submit">Submit</button>
-        </form>
-      </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+    <!-- Menu End -->
+    <footer class="footer">
+      <p>&copy; 2024 The Restaurant SCBD Jakarta. All rights reserved.</p>
+    </footer>
 </template>
 
-<script>
-import { onMounted, ref } from 'vue';
-const selected = ref('')
-export default {
-  setup() {
-    const showAddModal = ref(false);
-    const showEditModal = ref(false);
-    const newMenuItem = ref({ name: selected , quantity: 0 });
-    const selectedMenuItem = ref(null);
-    const menus = ref([]);
-    let ids = localStorage.getItem('lastUsedId') || 0; // Retrieve last used ID from localStorage
-    const fetchMenus = async () => {
-      try {
-        const response = await fetch('http://localhost:5174/menus');
-        if (!response.ok){
-          throw new Error ('failed')
-        }
-        menus.value = await response.json()
-      } catch (error) {
-        console.error('error',error)
-      }
-    }
-    onMounted(fetchMenus)
-    const addMenuItem = () => {
-      const apiUrl = 'http://localhost:5174/menus';
-      const requestBody = {
-        id : ++ids,
-        name: newMenuItem.value.name,
-        quantity: newMenuItem.value.quantity
-      };
-      localStorage.setItem('lastUsedId', ids);
-
-      // Fetch options
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      };
-
-      // Make API call
-      fetch(apiUrl, options)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to add menu item');
-          }
-          showAddModal.value = false;
-        })
-        .catch(error => {
-          console.error('Error adding menu item:', error);
-        });
-    };
-    const closeAddModal = () => {
-      showAddModal.value = false;
-    };
-
-    const closeEditModal = () => {
-      showEditModal.value = false;
-    };
-    const editMenuItem = async () => {
-      const selectedItem = menus.value.find(menu => menu.id === selectedMenuItem.value);
-      console.log(selectedItem.id)
-      if (!selectedItem) {
-        console.error('Selected menu item not found');
-        return;
-      }
-      const apiUrl2 = `http://localhost:5174/menus/${selectedItem.id}`;
-      const requestBody2 = { name: selectedItem.name, price: selectedItem.price };
-
-      const options = {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody2)
-      };
-      fetch(apiUrl2, options)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to add menu item');
-          }
-          showAddModal.value = false;
-        })
-        .catch(error => {
-          console.error('Error adding menu item:', error);
-        });
-      closeEditModal();
-    };
-    return {
-      showAddModal,
-      showEditModal,
-      newMenuItem,
-      selectedMenuItem,
-      addMenuItem,
-      closeAddModal,
-      closeEditModal,
-      editMenuItem
-    };
-  }
-};
-</script>
 
 
 <style scoped>
+/* Styles for modals and overlay */
 .modal {
-  display: block;
-  position: fixed;
-  z-index: 1;
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
 .modal-content {
   background-color: #fefefe;
-  margin: 10% auto;
+  margin: 15% auto; /* 15% from the top and centered */
   padding: 20px;
   border: 1px solid #888;
-  width: 80%;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+/* Modal Header */
+.modal-header {
+  background-color: #343a40;
+  color: #fff;
+  border-bottom: 1px solid #454d55;
+  text-align: center;
 }
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
+/* Modal Title */
+.modal-title {
+  font-size: 2rem;
+  margin: 5px;
 }
 
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
+/* Modal Body */
+.modal-body {
+  background-color: #f8f9fa;
+  margin-top: 10px;
+}
+
+/* Modal Footer */
+.modal-footer {
+  margin-top: 10px;
+}
+
+/* Close Button */
+.btn-close {
+  color: #fff;
+}
+
+/* Form Input Styles */
+.form-floating input[type="text"],
+.form-floating input[type="number"] {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  width: 500px;
+  height: 30px;
+}
+/* Textarea Style */
+.form-floating textarea {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  width: 500px;
+  height: 100px; /* Adjust height as needed */
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+/* Textarea Label Style */
+.form-floating textarea + label {
+  color: #495057;
+  margin-top: 0.5rem; /* Adjust spacing from textarea */
+}
+.footer {
+  background-color: rgba(241, 4, 103, 0.8);
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Form Label Styles */
+.form-floating label {
+  color: #495057;
+}
+.addmenubutton{
+  background-color: pink;
+  border-radius: 5px;
+  height: 30px;
+  width: 200px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+/* Primary Button */
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+  margin-left: 20px;
+  height: 40px;
+  width: 450px;
+  margin-right: 30px;
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  height: 40px;
+  width: 450px;
+  margin-left: 10px;
 }
 </style>
+
 
 
 
@@ -539,3 +348,5 @@ export default {
   width: 80%;
 }
 </style> -->
+
+

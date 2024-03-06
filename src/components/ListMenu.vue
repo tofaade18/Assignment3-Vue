@@ -7,9 +7,9 @@
 
       <div v-for="(item, i) in section.items" :key="i" class="menu-item">
         <div class="item-info">
-          <h3>{{ item.name }}</h3>
-          <p>{{ item.description }}</p>
-          <p>Price: ${{ item.price.toFixed(2) }}</p>
+          <h3 style="color: yellowgreen; font-weight: bolder;">{{ item.name }}</h3>
+          <p style="color: darkblue;">{{ item.description }}</p>
+          <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Price: ${{ item.price.toFixed(2) }}</p>
           <img :src="item.photo" alt="Item Photo" class="item-photo" style="width: 150px;"> <!-- Bind item photo to src attribute -->
         </div>  
 
@@ -21,17 +21,16 @@
       </div>
     </div>
 
-    <h2>Your Order</h2>
+    <!-- <h2>Your Order</h2>
     <ul>
       <li v-for="(quantity, itemName) in order" :key="itemName">
         {{ itemName }}: {{ quantity }}
       </li>
-    </ul>
+    </ul> -->
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
 import appetizer1 from '@/assets/PotatoWedges.jpg';
 import appetizer2 from '@/assets/SpringMixSalad.jpg';
 import maincourse1 from '@/assets/PattyLucyHotplateSteak.jpg';
@@ -40,7 +39,7 @@ import dessert1 from '@/assets/Panacotta.jpg';
 import dessert2 from '@/assets/icecreamloafcake.jpg';
 export default {
   name: 'Menu',
-  data() {
+  data() {  
     return {
       menuSections: [
         {
@@ -96,8 +95,8 @@ export default {
 <style scoped>
 /* Add your custom styles for the Menu component here */
 .menu {
-  max-width: 800px;
-  margin: auto;
+  max-width: 1300px;
+  margin-top: 70px;
 }
 
 .menu-section {
